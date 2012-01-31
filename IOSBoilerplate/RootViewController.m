@@ -37,6 +37,11 @@
 #import "SwipeableTableViewExample.h"
 #import "BrowserSampleViewController.h"
 
+#import "SVProgressHUD.h"
+#import "JSONKit.h"
+#import "DictionaryHelper.h"
+#import "AFJSONRequestOperation.h"
+
 @implementation RootViewController
 
 @synthesize table;
@@ -44,12 +49,28 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.title = @"Demos";
+    self.title = @"Groceries";
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    [SVProgressHUD showInView:self.view];
+    
+    
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://groceries-server.herokuapp.com/getList?listId=1"]];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        
+        items = [[JSON arrayForKey:@"items"] retain];
+        NSLog(@"items.count: %i",items.count);
+        
+        [self.table reloadData];
+        [SVProgressHUD dismissWithSuccess:@"Ok!"];
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
+        [SVProgressHUD dismissWithError:[error localizedDescription]];
+    }];
+    [operation start];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -73,133 +94,31 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 4;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    switch (section) {
-        case 0:
-            return @"HTTP requests";
-            break;
-            
-        case 1:
-            return @"UITableView";
-            break;
-            
-        case 2:
-            return @"Maps & locations";
-            break;
-            
-        case 3:
-            return @"Web Browser";
-            break;
-            
-        default:
-            break;
-    }
-    return nil;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    switch (section) {
-        case 0:
-            return 3;
-            break;
-            
-        case 1:
-            return 3;
-            break;
-            
-        case 2:
-            return 2;
-            break;
-            
-        case 3:
-            return 1;
-            break;
-            
-        default:
-            break;
+    if (items != nil) {
+        return [items count];
     }
+    
     return 0;
+    
 }
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"ListItem";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
     }
     
-    if (indexPath.section == 0) {
-        switch (indexPath.row) {
-            case 0:
-                cell.textLabel.text = @"HUD + JSON parsing";
-                cell.detailTextLabel.text = @"Shows a HUD spinner and parses JSON";
-                break;
-                
-            case 1:
-                cell.textLabel.text = @"Async image";
-                cell.detailTextLabel.text = @"Loads a simple image asynchronously";
-                break;
-                
-            case 2:
-                cell.textLabel.text = @"Async cell images";
-                cell.detailTextLabel.text = @"Loads images inside cells asynchronously";
-                break;
-                
-            default:
-                break;
-        }
-    } else if (indexPath.section == 1) {
-        switch (indexPath.row) {
-            case 0:
-                cell.textLabel.text = @"Variable-height cells";
-                cell.detailTextLabel.text = @"Implements a FastCell with variable height";
-                break;
-                
-            case 1:
-                cell.textLabel.text = @"Pull down to refresh";
-                cell.detailTextLabel.text = @"Extends a base class to add that feature";
-                break;
-                
-            case 2:
-                cell.textLabel.text = @"Swipe cell";
-                cell.detailTextLabel.text = @"Demonstrates how to make swipeable cells";
-                break;
-                
-            default:
-                break;
-        }
-    } else if (indexPath.section == 2) {
-        switch (indexPath.row) {
-            case 0:
-                cell.textLabel.text = @"Directions";
-                cell.detailTextLabel.text = @"Map Overlays + Google Maps API";
-                break;
-                
-            case 1:
-                cell.textLabel.text = @"Autocomplete location";
-                cell.detailTextLabel.text = @"Uses the Google Maps API to search locations";
-                break;
-                
-            default:
-                break;
-        }
-    } else if (indexPath.section == 3) {
-        switch (indexPath.row) {
-            case 0:
-                cell.textLabel.text = @"Web Browser integration";
-                cell.detailTextLabel.text = @"Open URLs from UITextViews, UIWebViews, UITableViews, and UIButtons";
-                break;
-                
-            default:
-                break;
-        }
+    if (items != nil) {
+        cell.textLabel.text = [items objectAtIndex:indexPath.row];
     }
     
     return cell;

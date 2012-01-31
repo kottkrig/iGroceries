@@ -29,7 +29,7 @@
 #import <UIKit/UIKit.h>
 
 @interface RootViewController : UIViewController <UITableViewDelegate, UITableViewDataSource> {
-    
+    NSArray *items;
 }
 
 @property (nonatomic, retain) IBOutlet UITableView* table;
