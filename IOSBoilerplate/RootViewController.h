@@ -30,8 +30,15 @@
 
 @interface RootViewController : UIViewController <UITableViewDelegate, UITableViewDataSource> {
     NSArray *items;
+    
 }
 
+- (void)addItemToList:(NSString *)item;
+- (void)removeItemFromList:(NSString *)item;
+- (void)updateList;
+
 @property (nonatomic, retain) IBOutlet UITableView* table;
+@property (nonatomic, retain) IBOutlet UITextField* addField;
+
 
 @end

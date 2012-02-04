@@ -41,36 +41,24 @@
 #import "JSONKit.h"
 #import "DictionaryHelper.h"
 #import "AFJSONRequestOperation.h"
+#import "Constants.h"
+
 
 @implementation RootViewController
 
 @synthesize table;
+@synthesize addField;
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     self.title = @"Groceries";
+    
+    [self updateList];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [SVProgressHUD showInView:self.view];
-    
-    
-    
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://groceries-server.herokuapp.com/getList?listId=1"]];
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-        
-        items = [[JSON arrayForKey:@"items"] retain];
-        NSLog(@"items.count: %i",items.count);
-        
-        [self.table reloadData];
-        [SVProgressHUD dismissWithSuccess:@"Ok!"];
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
-        [SVProgressHUD dismissWithError:[error localizedDescription]];
-    }];
-    [operation start];
+    [super viewWillAppear:animated];        
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -127,73 +115,100 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+            
+    NSString *item = [tableView cellForRowAtIndexPath:indexPath].textLabel.text;
     
-    UIViewController* vc = nil;
-    
-    if (indexPath.section == 0) {
-        switch (indexPath.row) {
-            case 0:
-                vc = [[HTTPHUDExample alloc] init];
-                break;
-                
-            case 1:
-                vc = [[AsyncImageExample alloc] init];
-                break;
-                
-            case 2:
-                vc = [[AsyncCellImagesExample alloc] init];
-                break;
-                
-            default:
-                break;
-        }
-    } else if (indexPath.section == 1) {
-        switch (indexPath.row) {
-            case 0:
-                vc = [[VariableHeightExample alloc] init];
-                break;
-                
-            case 1:
-                vc = [[PullDownExample alloc] init];
-                break;
-                
-            case 2:
-                vc = [[SwipeableTableViewExample alloc] init];
-                break;
-                
-            default:
-                break;
-        }
-    } else if (indexPath.section == 2) {
-        switch (indexPath.row) {
-            case 0:
-                vc = [[DirectionsExample alloc] init];
-                break;
-                
-            case 1:
-                vc = [[AutocompleteLocationExample alloc] init];
-                break;
-                
-            default:
-                break;
-        }
-    } else if (indexPath.section == 3) {
-        switch (indexPath.row) {
-            case 0:
-                vc = [[BrowserSampleViewController alloc] init];
-                break;
-                
-            default:
-                break;
-        }
-    }
-    
-    if (vc) {
-        [self.navigationController pushViewController:vc animated:YES];
-        [vc release];
-    }
-
+    [self removeItemFromList:item];
 }
+
+- (void)removeItemFromList:(NSString *)item
+{
+    [SVProgressHUD showInView:self.view];
+    
+    NSString *requestString = [NSString stringWithFormat:@"%@/list/%i/", serverUrl, listId, item];
+    NSURL *remoteUrl = [NSURL URLWithString:requestString];
+    
+    AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:remoteUrl];
+    NSMutableURLRequest *request = [httpClient requestWithMethod:@"DELETE" path:item parameters:nil];
+        
+    AFHTTPRequestOperation *operation = [AFHTTPRequestOperation HTTPRequestOperationWithRequest:request success:^(id status) {
+        
+        [SVProgressHUD dismissWithSuccess:@"Removed!"];
+        [self updateList];
+        
+    } failure:^(NSHTTPURLResponse *response, NSError *error) {
+        [SVProgressHUD dismissWithError:[error localizedDescription]];
+        NSLog([error localizedDescription]);
+    }];
+    [operation start];
+}
+
+- (void)updateList
+{
+    [SVProgressHUD showInView:self.view];
+    
+    NSString *requestUrl = [NSString stringWithFormat:@"%@/list/%i", serverUrl, listId];
+    
+    NSLog(requestUrl);
+        
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:requestUrl]];
+    
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        
+        items = [[JSON arrayForKey:@"items"] retain];
+        NSLog(@"items.count: %i",items.count);
+        
+        [self.table reloadData];
+        [SVProgressHUD dismissWithSuccess:@"Ok!"];
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error) {
+        [SVProgressHUD dismissWithError:[error localizedDescription]];
+    }];
+    [operation start];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    //[textField resignFirstResponder];
+    
+    NSLog(@"Trying to add something!");
+    
+    [self addItemToList:textField.text];
+    
+    
+    return YES;
+}
+
+- (void)addItemToList:(NSString *)item
+{
+    [SVProgressHUD showInView:self.view];
+    
+    NSLog(item);
+    
+    NSURL *remoteUrl = [NSURL URLWithString:serverUrl];
+    
+    NSDictionary *parameters = [NSDictionary dictionaryWithObject:item forKey:@"item"];
+    
+    NSString *path = [NSString stringWithFormat:@"list/%i", listId];
+    
+    AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:remoteUrl];
+    NSURLRequest *request = [httpClient requestWithMethod:@"POST" path:path parameters:parameters];
+    
+    
+    
+    //NSLog([NSString stringWithFormat:@"Request: %@", [[request HTTPBody]]);
+    
+    AFHTTPRequestOperation *operation = [AFHTTPRequestOperation HTTPRequestOperationWithRequest:request success:^(id status) {
+        
+        [SVProgressHUD dismissWithSuccess:@"Added!"];
+        [self updateList];
+        
+    } failure:^(NSHTTPURLResponse *response, NSError *error) {
+        [SVProgressHUD dismissWithError:[error localizedDescription]];
+        NSLog([error localizedDescription]);
+    }];
+    [operation start];
+}
+
 
 - (void)didReceiveMemoryWarning
 {

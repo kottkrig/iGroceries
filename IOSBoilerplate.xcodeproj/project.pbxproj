@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04C68D8C14DD93B700432394 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 04C68D8B14DD93B700432394 /* Constants.m */; };
 		09153E17141A16CB004E138C /* VariableHeightExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 09153E15141A16CB004E138C /* VariableHeightExample.m */; };
 		09153E18141A16CB004E138C /* VariableHeightExample.xib in Resources */ = {isa = PBXBuildFile; fileRef = 09153E16141A16CB004E138C /* VariableHeightExample.xib */; };
 		09153E1C141A176C004E138C /* VariableHeightCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 09153E1B141A176C004E138C /* VariableHeightCell.m */; };
@@ -96,6 +97,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		04C68D8A14DD93B700432394 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		04C68D8B14DD93B700432394 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		09153E14141A16CB004E138C /* VariableHeightExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VariableHeightExample.h; sourceTree = "<group>"; };
 		09153E15141A16CB004E138C /* VariableHeightExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VariableHeightExample.m; sourceTree = "<group>"; };
 		09153E16141A16CB004E138C /* VariableHeightExample.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VariableHeightExample.xib; sourceTree = "<group>"; };
@@ -337,6 +340,8 @@
 				09885EAA1418F2E600CCE17A /* RootViewController.m */,
 				09885EAC1418F2E600CCE17A /* RootViewController.xib */,
 				09885E9B1418F2E600CCE17A /* Supporting Files */,
+				04C68D8A14DD93B700432394 /* Constants.h */,
+				04C68D8B14DD93B700432394 /* Constants.m */,
 			);
 			path = IOSBoilerplate;
 			sourceTree = "<group>";
@@ -663,6 +668,7 @@
 				D8EA24C6145BA49100EB08B3 /* MyApplication.m in Sources */,
 				D8EA24D3145BA4BC00EB08B3 /* BrowserSampleViewController.m in Sources */,
 				F87266BC145EF4E200B775D3 /* TwitterSearchClient.m in Sources */,
+				04C68D8C14DD93B700432394 /* Constants.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
