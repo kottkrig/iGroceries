@@ -27,15 +27,6 @@
 //  
 
 #import "RootViewController.h"
-#import "HTTPHUDExample.h"
-#import "AsyncImageExample.h"
-#import "AsyncCellImagesExample.h"
-#import "VariableHeightExample.h"
-#import "DirectionsExample.h"
-#import "AutocompleteLocationExample.h"
-#import "PullDownExample.h"
-#import "SwipeableTableViewExample.h"
-#import "BrowserSampleViewController.h"
 
 #import "SVProgressHUD.h"
 #import "JSONKit.h"
@@ -100,14 +91,25 @@
 {
     static NSString *CellIdentifier = @"ListItem";
     
+    
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
     }
     
     if (items != nil) {
         cell.textLabel.text = [items objectAtIndex:indexPath.row];
+        cell.textLabel.opaque = NO;
+        cell.textLabel.backgroundColor = [UIColor clearColor];
+        
+        UIImageView *backgroundPattern = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"handmadepaper.png"]];
+        
+        cell.backgroundView = backgroundPattern;
+        [backgroundPattern release];
     }
+    
+    
     
     return cell;
 }
